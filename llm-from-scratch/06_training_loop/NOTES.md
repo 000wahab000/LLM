@@ -7,6 +7,51 @@
 
 ---
 
+## ⏱️ Before You Hit Run — Read This First
+
+This is the phase most likely to surprise you with a wall-clock reality check. Read these numbers before you start, not after you've been waiting 45 minutes wondering if something is broken.
+
+### GPU requirement
+
+| Run type | Minimum tier | Why |
+|---|---|---|
+| **Toy run** (verify loss is decreasing) | Colab free T4 | Fine — short, just needs a gradient to flow |
+| **Real run** (produce usable output) | Colab free T4 is enough, but session time is the limit | A full run may outlast a free session — use `--resume` |
+| **Full training** (thousands of steps to convergence) | Colab Pro or Pro+ recommended | Longer sessions, background execution, faster A100 |
+
+### Approximate wall-clock times on a Colab T4 (120M params, TinyStories, batch=32)
+
+| Steps | Wall-clock | What you learn |
+|---|---|---|
+| **200 steps** | ~3–5 minutes | Whether loss is decreasing at all. This is your **toy run**. Do this first. |
+| **2,000 steps** | ~25–35 minutes | Whether the loss curve is behaving (smooth decrease, no explosion). |
+| **10,000 steps** | ~2–3 hours | Model begins producing vaguely story-shaped text. Minimum for phase 7. |
+| **50,000+ steps** | Many hours, multi-session | Coherent completions. Requires checkpoint-resume across Colab sessions. |
+
+### Toy run vs real run — do the toy run first, always
+
+A **toy run** is 200 steps just to confirm the system works end-to-end:
+- Loss decreases? ✓ Your model is learning.
+- Loss explodes or NaN? ✗ Check gradient clipping, LR, batch size.
+- Runs without error but loss doesn't move? ✗ Check your data pipeline.
+
+Only start a **real run** after the toy run passes. Do not invest hours into a run that has a silent bug you could have caught in 5 minutes.
+
+### Colab disconnects — `train.py` already supports resume
+
+Colab free tier will disconnect you mid-session. This is expected, not a failure.
+
+`train.py` saves a checkpoint every `eval_interval` steps. To resume after a disconnect:
+
+```bash
+python train.py --resume
+```
+
+This picks up from the last saved checkpoint automatically. **Set `eval_interval` to something small (e.g. 100 steps) for long runs** so you lose at most that many steps to a disconnect.
+
+---
+
+
 ## Resources
 
 **Read + watch (both):**

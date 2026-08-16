@@ -1,0 +1,16 @@
+# ignore saved weights - use HF Hub instead
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+
+# jupyter
+.ipynb_checkpoints/
+
+# python
+__pycache__/
+*.pyc
+.env
+venv/
